@@ -18,6 +18,11 @@ jobs:
           script: |
             set -e # 오류 발생 시 즉시 종료
 
+            # 저장소 초기화
+            if [ ! -d "${{ secrets.APP_DIR }}/.git" ]; then
+              git clone https://github.com/jeongbaebang/test-ubuntu2.git ${{ secrets.APP_DIR }}
+            fi
+
             # 애플리케이션 디렉토리로 이동
             cd ${{ secrets.APP_DIR }}
 
