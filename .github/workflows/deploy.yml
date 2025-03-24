@@ -8,42 +8,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # 1. pnpm 우선 설치
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 8.x
-          run_install: false
-
-      # 2. Node.js 설정
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      # 3. 캐시 최적화
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pnpm-store
-            ~/.local/share/pnpm/store
-            node_modules
-            .next/cache
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build project
-        run: pnpm build
-
       - name: Deploy to production
         uses: appleboy/ssh-action@master
         with:
@@ -54,13 +18,11 @@ jobs:
           script: |
             set -e # 오류 발생 시 즉시 종료
 
-            # 저장소 초기화
-            if [ ! -d "${{ secrets.APP_DIR }}/.git" ]; then
-              git clone https://github.com/jeongbaebang/test-ubuntu2.git ${{ secrets.APP_DIR }}
-            fi
-
+            # 애플리케이션 디렉토리로 이동
             cd ${{ secrets.APP_DIR }}
-            git fetch --all
+
+            # 최신 코드 가져오기
+            git fetch origin main
             git reset --hard origin/main
 
             # 환경 변수 설정
@@ -69,17 +31,20 @@ jobs:
             export PNPM_HOME="$HOME/.local/share/pnpm"
             export PATH="$PNPM_HOME:$PATH"
 
-            # pnpm 설치 (최초 1회만 실행)
+            # pnpm 설치 확인 및 설치 (필요한 경우)
             if ! command -v pnpm &> /dev/null; then
               curl -fsSL https://get.pnpm.io/install.sh | sh -
               source ~/.bashrc
             fi
 
-            # 의존성 설치 및 빌드
-            pnpm install 
+            # 의존성 설치
+            pnpm install
+
+            # 프로젝트 빌드
             pnpm build
 
-            # PM2 프로세스 관리
+            # PM2로 애플리케이션 재시작
             pm2 restart next-app --update-env || pm2 start "pnpm start" --name "next-app"
 
+            # PM2 설정 저장
             pm2 save
