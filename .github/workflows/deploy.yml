@@ -1,0 +1,79 @@
+name: Deploy Next.js Application
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.x
+
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build project
+        run: pnpm build
+
+      - name: Deploy to production
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_SSH_HOST }}
+          username: ${{ secrets.REMOTE_SSH_USERNAME }}
+          key: ${{ secrets.REMOTE_SSH_KEY }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
+          script: |
+            # 저장소 초기화
+            if [ ! -d "${{ secrets.APP_DIR }}/.git" ]; then
+              cd ${{ secrets.APP_DIR }}
+              git init
+              git remote add origin https://github.com/jeongbaebang/test-ubuntu2.git
+              git fetch
+            fi
+
+            cd ${{ secrets.APP_DIR }}
+            git fetch --all
+            git reset --hard origin/main
+
+            # 환경 변수 설정
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # pnpm 설치 (최초 1회만 실행)
+            if ! command -v pnpm &> /dev/null; then
+              curl -fsSL https://get.pnpm.io/install.sh | sh -
+              source ~/.bashrc
+            fi
+
+            # 의존성 설치 및 빌드
+            pnpm install --frozen-lockfile --prod
+            pnpm build
+
+            # PM2 프로세스 관리
+            pm2 restart next-app --update-env || pm2 start pnpm --name "next-app" -- start
+
+            pm2 save
