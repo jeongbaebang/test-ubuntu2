@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Build project
         run: pnpm build
@@ -76,7 +76,7 @@ jobs:
             fi
 
             # 의존성 설치 및 빌드
-            pnpm install --frozen-lockfile 
+            pnpm install 
             pnpm build
 
             # PM2 프로세스 관리
