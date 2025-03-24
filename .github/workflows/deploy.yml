@@ -11,22 +11,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 1. pnpm 우선 설치
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.x
+          run_install: false
+
+      # 2. Node.js 설정
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8.x
-
+      # 3. 캐시 최적화
       - name: Cache pnpm dependencies
         uses: actions/cache@v3
         with:
           path: |
             ~/.pnpm-store
+            ~/.local/share/pnpm/store
             node_modules
             .next/cache
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
@@ -62,6 +67,8 @@ jobs:
             # 환경 변수 설정
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            export PATH="$PNPM_HOME:$PATH"
 
             # pnpm 설치 (최초 1회만 실행)
             if ! command -v pnpm &> /dev/null; then
