@@ -23,7 +23,7 @@ export default async function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
-      {data ? (
+      {data.user ? (
         <>
           <h1 className="text-2xl font-bold mb-6">로그아웃</h1>
           <Logout />
