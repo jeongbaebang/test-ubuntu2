@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     console.log(error);
 
     if (!error) {
-      return NextResponse.redirect(new URL(next, origin));
+      return NextResponse.redirect(new URL('/', origin));
     }
   }
 
