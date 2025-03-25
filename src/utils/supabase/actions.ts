@@ -20,6 +20,7 @@ export async function signInWithGoogle() {
     provider: 'google',
     options: {
       redirectTo: `${origin}/auth/callback`,
+      queryParams: { prompt: 'select_account' },
     },
   });
 
@@ -35,7 +36,7 @@ export async function signInWithGoogle() {
 
 export async function logout() {
   const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut({ scope: 'global' });
 
   if (error) {
     console.error(error);

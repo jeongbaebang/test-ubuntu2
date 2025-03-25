@@ -6,12 +6,12 @@ export default async function LoginPage() {
   const supabase = await createClient();
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
-      {session ? (
+      {user ? (
         <>
           <h1 className="text-2xl font-bold mb-6">로그아웃</h1>
           <Logout />
