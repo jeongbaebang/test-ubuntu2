@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const origin =
     headersList.get('origin') || (process.env.NEXT_PUBLIC_SITE_URL as string);
   const code = requestUrl.searchParams.get('code');
-  const next = requestUrl.searchParams.get('next') || '/';
+  // const next = requestUrl.searchParams.get('next') || '/';
 
   console.log('export async function GET(request: NextRequest) {');
   console.log('request', request.url);
