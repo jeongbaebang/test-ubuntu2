@@ -4,14 +4,13 @@ import { createClient } from '@/utils/supabase/server';
 
 export default async function LoginPage() {
   const supabase = await createClient();
-
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
-      {user ? (
+      {session ? (
         <>
           <h1 className="text-2xl font-bold mb-6">로그아웃</h1>
           <Logout />
