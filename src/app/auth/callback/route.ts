@@ -3,10 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log(request);
     const origin = process.env.NEXT_PUBLIC_SITE_URL;
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
+
+    console.log('export async function GET(request: NextRequest) {');
+    console.log('request', request.url);
+    console.log('request', origin);
+    console.log('end--');
 
     if (!code) throw new Error('Authorization code missing');
 
