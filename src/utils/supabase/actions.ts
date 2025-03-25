@@ -38,7 +38,7 @@ export async function logout() {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
   const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut({ scope: 'global' });
 
   if (error) {
     for (const cookie of allCookies) {
