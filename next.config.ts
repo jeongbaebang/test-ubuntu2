@@ -4,11 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     serverActions: {
-      allowedOrigins: [
-        'www.chokoppang.com',
-        'chokoppang.com',
-        'localhost:3000',
-      ],
+      allowedOrigins: ['*.chokoppang.com', 'localhost:3000'],
     },
   },
 };
