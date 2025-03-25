@@ -28,6 +28,8 @@ export async function signInWithGoogle() {
     return redirect('/error');
   }
 
+  console.log('data.url:', data.url);
+
   return redirect(data.url);
 }
 
