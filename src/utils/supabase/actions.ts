@@ -10,6 +10,8 @@ export async function signInWithGoogle() {
   const headersList = await headers();
   const origin = headersList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL;
 
+  console.log(headersList.get('origin'));
+  console.log(headersList.get(origin || '없음'));
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
