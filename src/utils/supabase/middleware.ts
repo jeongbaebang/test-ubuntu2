@@ -50,6 +50,8 @@ export async function updateSession(request: NextRequest) {
     //   request.nextUrl.pathname + request.nextUrl.search
     // );
 
+    console.log('middleware request url');
+    console.log(request.url);
     const response = NextResponse.redirect(redirectUrl);
 
     response.cookies.set(

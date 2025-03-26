@@ -51,4 +51,6 @@ export async function logout() {
       }
     }
   }
+
+  redirect('/');
 }
