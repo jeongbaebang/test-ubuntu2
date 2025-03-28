@@ -1,6 +1,6 @@
 'use server';
 
-import { cookies, headers } from 'next/headers';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { createClient } from './server';
@@ -35,22 +35,8 @@ export async function signInWithGoogle() {
 }
 
 export async function logout() {
-  const cookieStore = await cookies();
-  const allCookies = cookieStore.getAll();
   const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
-
-  if (error) {
-    for (const cookie of allCookies) {
-      if (
-        cookie.name.startsWith('sb-') ||
-        cookie.name.includes('supabase') ||
-        cookie.name.includes('auth')
-      ) {
-        cookieStore.delete(cookie.name);
-      }
-    }
-  }
+  await supabase.auth.signOut();
 
   redirect('/');
 }
